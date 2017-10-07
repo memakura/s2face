@@ -1,0 +1,17 @@
+{
+    "extensionName": "s2face",
+    "extensionPort": 50212,
+    "url": "https://github.com/memakura/s2face",
+    "blockSpecs": [
+        [
+            "r",
+            "顔のx座標",
+            "face_x",
+        ],
+        [
+            "r",
+            "顔のy座標",
+            "face_y",
+        ]
+    ]
+}
