@@ -1,0 +1,32 @@
+{
+    "extensionName": "s2face",
+    "extensionPort": 50212,
+    "url": "https://github.com/memakura/s2face",
+    "blockSpecs": [
+        [
+            "r",
+            "カメラで見つけたx座標",
+            "face_x",
+        ],
+        [
+            "r",
+            "カメラで見つけたy座標",
+            "face_y",
+        ],
+        [
+            "r",
+            "見つけた大きさ(よこ)",
+            "face_width",
+        ],
+        [
+            "r",
+            "見つけた大きさ(たて)",
+            "face_height",
+        ],
+        [
+            "b",
+            "カメラで見つかった",
+            "face_exist",
+        ]
+    ]
+}
