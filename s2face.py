@@ -14,8 +14,16 @@ class S2FACE:
     """ Face detctor class for Scratch 2 extension """
 
     def __init__(self):
-        self.cascPath = 'haarcascades/haarcascade_frontalface_default.xml'
-        self.faceCascade = cv2.CascadeClassifier(self.cascPath)
+        self.casc_dir = 'haarcascades/'
+        self.casc_file = [
+            "dummy",
+            "haarcascade_frontalface_default.xml",
+            "haarcascade_smile.xml",
+            "haarcascade_upperbody.xml",
+            "haarcascade_eye.xml"
+        ]
+
+        self.face_cascade = cv2.CascadeClassifier(self.casc_dir + self.casc_file[1])
         self.video_capture = cv2.VideoCapture(0)
         self.helper_host = '127.0.0.1'
         self.helper_port = 50212
@@ -23,6 +31,8 @@ class S2FACE:
         self.face_exist = False
         self.face_x = 0
         self.face_y = 0
+        self.face_width = 0
+        # self.face_height = 0
         self.ratio = 0
 
         width = self.video_capture.get(3)
@@ -30,7 +40,6 @@ class S2FACE:
         self.s2_xmax = 240
         self.s2_ymax = 180
         self.s2cv_ratio = self.s2_xmax*2 / width
-        #print("width= {}".format(width))
 
     async def run_captureloop(self):
         """ Video capture loop """
@@ -38,16 +47,14 @@ class S2FACE:
             # Capture frame-by-frame
             ret, frame = self.video_capture.read()
 
-
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-            faces = self.faceCascade.detectMultiScale(
+            faces = self.face_cascade.detectMultiScale(
                 gray,
                 scaleFactor=1.1,
                 minNeighbors=5,
                 minSize=(30, 30)
             )
-
 
             if len(faces)==0:
                 self.face_exist = False
@@ -58,7 +65,7 @@ class S2FACE:
                     self.face_x = int((x + w/2) * self.s2cv_ratio - self.s2_xmax)
                     self.face_y = int(self.s2_ymax - (y + h/2) * self.s2cv_ratio)
                     self.face_width = int(w * self.s2cv_ratio)
-                    self.face_height = int(h * self.s2cv_ratio)
+                    # self.face_height = int(h * self.s2cv_ratio)
 
             # Display the resulting frame
             cv2.imshow('Video', frame)
@@ -66,6 +73,7 @@ class S2FACE:
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
+        
         # When everything is done, release the capture
         self.video_capture.release()
         cv2.destroyAllWindows()
@@ -74,35 +82,25 @@ class S2FACE:
         """ Handle polling from Scratch """
         text = "face_x " + str(self.face_x) + "\n"
         text += "face_y " + str(self.face_y) + "\n"
-        text += "face_width " + str(self.face_width) + "\n"
-        text += "face_height " + str(self.face_height) + "\n"
+        text += "face_size " + str(self.face_width) + "\n"
         text += "face_exist " + ("true" if self.face_exist else "false") + "\n"
         return web.Response(text=text)
 
 
-    # async def handle_beep(self, request):
-    #     """ Handle beep request from Scratch """
-    #     print("play beep!")
-    #     print("\007")
-    #     return web.Response(text="OK")
-
-    # async def handle_setvolume(self, request):
-    #     """ Handle set volume request from Scratch """
-    #     tmp_volume = int(request.match_info['vol'])
-    #     if tmp_volume >= 0 and tmp_volume <= 10:
-    #         self.volume = tmp_volume
-    #         print("set volume= " + str(self.volume))
-    #     else:
-    #         print("out of range: " + str(self.volume))
-    #     return web.Response(text="OK")
+    # async def set_object(self, request):
+    #     """ Change object to detect """
+    #     ss = request.match_info['obj'].split(':')
+    #     #print(ss[0])
+    #     print(self.casc_file[int(ss[0])])
+    #     self.face_cascade = cv2.CascadeClassifier(self.casc_dir + self.casc_file[int(ss[0])])
+    #     return web.Response(text='OK')
 
     def main(self):
         """ Main routine """
         loop = asyncio.get_event_loop()
         app = web.Application(loop=loop)
         app.router.add_get('/poll', self.handle_poll)
-#        app.router.add_get('/playBeep', self.handle_beep)
-#        app.router.add_get('/setVolume/{vol}', self.handle_setvolume)
+        # app.router.add_get('/set_object/{obj}', self.set_object)
 
         scratch_server = loop.create_server(app.make_handler(), self.helper_host, self.helper_port)
         #web.run_app(app, host='127.0.0.1', port=12345)
