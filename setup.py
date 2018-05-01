@@ -15,7 +15,7 @@ os.environ['TK_LIBRARY'] = os.path.join(PYTHON_INSTALL_DIR, 'tcl', 'tk8.6')
 
 name = "s2face"
 version = "0.1"
-description = 'Scratch2 face detector (Open CV)'
+description = 'Offline Face Detector'
 author = 'Hiroaki Kawashima'
 url ='https://github.com/memakura/s2face'
 
