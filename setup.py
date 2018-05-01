@@ -44,7 +44,7 @@ shortcut_table = [
 # Now create the table dictionary
 msi_data = {"Shortcut": shortcut_table}
 
-build_exe_options = {"packages": ['asyncio', 'idna', 'numpy.core.multiarray'],
+build_exe_options = {"packages": ['asyncio', 'numpy', 'idna'],
                     "excludes": [],
                     "includes": [],
                     "include_files": ['images/','00scratch/', 'haarcascades/']
